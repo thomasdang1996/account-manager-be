@@ -43,7 +43,7 @@
         <confluent.version>7.5.0</confluent.version>
         <openapi.webmvc.ui.version>2.0.2</openapi.webmvc.ui.version>
         <openapi.javadoc.version>1.6.14</openapi.javadoc.version>
-        <target.avro>${project.basedir}/target/avro</target.avro>
+        <avsc.location>${project.basedir}/src/main/resources/avro</avsc.location>
     </properties>
     <dependencies>
         <!--        SPRING BOOT STARTERS-->
@@ -93,6 +93,12 @@
             <version>${confluent.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.dang</groupId>
+            <artifactId>pear-store-be</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
         <!--SWAGGER-->
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -127,7 +133,7 @@
                 <artifactId>kafka-schema-registry-maven-plugin</artifactId>
                 <version>${confluent.version}</version>
                 <configuration>
-                    <outputDirectory>${target.avro}</outputDirectory>
+                    <outputDirectory>${avsc.location}</outputDirectory>
                     <schemaRegistryUrls>
                         <param>http://127.0.0.1:8081</param>
                     </schemaRegistryUrls>
@@ -163,7 +169,7 @@
                         </goals>
                         <configuration>
                             <subjects>
-                                <CreateAccountPayload>${target.avro}/CreateAccountPayload.avsc</CreateAccountPayload>
+                                <CreateAccountPayload>${avsc.location}/CreateAccountPayload.avsc</CreateAccountPayload>
                             </subjects>
                         </configuration>
                     </execution>
@@ -186,7 +192,7 @@
                             <goal>schema</goal>
                         </goals>
                         <configuration>
-                            <sourceDirectory>${target.avro}</sourceDirectory>
+                            <sourceDirectory>${avsc.location}</sourceDirectory>
                             <outputDirectory>${project.basedir}/target/generated-sources/avro</outputDirectory>
                         </configuration>
                     </execution>
@@ -225,6 +231,81 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+
+            <!--CHECK ACTIVE PROFILES DURING COMPILE PHASE-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-help-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>show-profiles</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>active-profiles</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>no-schema-registry</id>
+            <build>
+                <plugins>
+                    <!--DOWNLOAD/UPLOAD AVRO SCHEMAS-->
+                    <plugin>
+                        <groupId>io.confluent</groupId>
+                        <artifactId>kafka-schema-registry-maven-plugin</artifactId>
+                        <version>${confluent.version}</version>
+                        <configuration>
+                            <outputDirectory>${avsc.location}</outputDirectory>
+                            <schemaRegistryUrls>
+                                <param>http://127.0.0.1:8081</param>
+                            </schemaRegistryUrls>
+                            <compatibilityLevels/>
+                            <messagePath/>
+                            <outputPath/>
+                            <previousSchemaPaths/>
+                            <schemas/>
+                            <subjects/>
+                        </configuration>
+                        <executions>
+                            <!--DOWNLOAD-->
+                            <execution>
+                                <id>download-schema</id>
+                                <phase>none</phase>
+                                <goals>
+                                    <goal>download</goal>
+                                </goals>
+                                <configuration>
+                                    <subjectPatterns>
+                                        <!--THIS WON'T WORK WITH PARENTHESES!!!-->
+                                        <param>CreateAccountPayload</param>
+                                    </subjectPatterns>
+                                    <outputDirectory/>
+                                </configuration>
+                            </execution>
+                            <!--UPLOAD-->
+                            <execution>
+                                <id>upload-schema</id>
+                                <phase>none</phase>
+                                <goals>
+                                    <goal>register</goal>
+                                </goals>
+                                <configuration>
+                                    <subjects>
+                                        <CreateAccountPayload>${avsc.location}/CreateAccountPayload.avsc
+                                        </CreateAccountPayload>
+                                    </subjects>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
