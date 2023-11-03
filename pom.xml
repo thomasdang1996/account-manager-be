@@ -93,12 +93,6 @@
             <version>${confluent.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.dang</groupId>
-            <artifactId>pear-store-be</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-
         <!--SWAGGER-->
         <dependency>
             <groupId>org.springdoc</groupId>
