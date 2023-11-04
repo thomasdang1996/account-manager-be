@@ -3,6 +3,8 @@ package com.dang.accountmanager.be.handler;
 import avrogenerated.accountmanager.AccountCreated;
 import avrogenerated.accountmanager.AccountCreationFailed;
 import avrogenerated.accountmanager.CreateAccountPayload;
+import com.dang.accountmanager.be.mapper.AccountMapper;
+import com.dang.accountmanager.be.repository.AccountRepository;
 import com.dang.commonlib.messaging.MessageBus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class NotificationHandler {
     private final MessageBus messageBus;
+    private final AccountRepository repository;
+    private final AccountMapper mapper;
 
     @KafkaListener(
             topics = "${app.kafka.consumer.topic}",
@@ -28,25 +32,33 @@ public class NotificationHandler {
     )
     public void receive(CreateAccountPayload message) {
         log.info("Data received: {}", message);
+        SpecificRecord response = validateMessage(message);
         messageBus.sendMessage(
-                getRecord(message)
+                response
         );
     }
 
-    private SpecificRecord getRecord(CreateAccountPayload message) {
+    private SpecificRecord validateMessage(CreateAccountPayload message) {
         if (accountExists(message)) {
             return new AccountCreationFailed(
                     "Username " + message.getUsername() + " is already taken"
             );
         }
-
+        UUID accountId = UUID.randomUUID();
+        repository.save(
+                mapper.toAccountEntity(
+                        accountId,
+                        message.getUsername(),
+                        message.getUsername()
+                )
+        );
         return new AccountCreated(
-                UUID.randomUUID(),
+                accountId,
                 message.getUsername()
         );
     }
 
-    private static boolean accountExists(CreateAccountPayload message) {
-        return message.getUsername().equals("someExistingGuy55");
+    private boolean accountExists(CreateAccountPayload message) {
+        return repository.existsByUsername(message.getUsername());
     }
 }
