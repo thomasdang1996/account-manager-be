@@ -1,0 +1,21 @@
+{
+  "type": "record",
+  "name": "AccountCreated",
+  "namespace": "avrogenerated.accountmanager",
+  "fields": [
+    {
+      "name": "id",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      }
+    },
+    {
+      "name": "username",
+      "type": {
+        "type": "string",
+        "avro.java.string": "String"
+      }
+    }
+  ]
+}
