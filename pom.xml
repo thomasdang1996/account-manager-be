@@ -104,6 +104,13 @@
             <artifactId>springdoc-openapi-javadoc</artifactId>
             <version>${openapi.javadoc.version}</version>
         </dependency>
+
+<!--CUSTOM LIBRARIES-->
+        <dependency>
+            <groupId>com.dang</groupId>
+            <artifactId>common-lib</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -164,6 +171,8 @@
                         <configuration>
                             <subjects>
                                 <CreateAccountPayload>${avsc.location}/CreateAccountPayload.avsc</CreateAccountPayload>
+                                <AccountCreationFailed>${avsc.location}/AccountCreationFailed.avsc</AccountCreationFailed>
+                                <AccountCreated>${avsc.location}/AccountCreated.avsc</AccountCreated>
                             </subjects>
                         </configuration>
                     </execution>

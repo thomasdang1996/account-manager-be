@@ -1,0 +1,14 @@
+{
+  "type": "record",
+  "name": "AccountCreationFailed",
+  "namespace": "avrogenerated.accountmanager",
+  "fields": [
+    {
+      "name": "message",
+      "type": {
+        "type": "string",
+        "avro.java.string": "String"
+      }
+    }
+  ]
+}
