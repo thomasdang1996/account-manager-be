@@ -27,7 +27,6 @@ public class NotificationHandler {
 
     @KafkaListener(
             topics = "${app.kafka.consumer.topic}",
-            containerFactory = "kafkaListenerContainerFactory",
             groupId = "my-group-id"
     )
     public void receive(CreateAccountPayload message) {
