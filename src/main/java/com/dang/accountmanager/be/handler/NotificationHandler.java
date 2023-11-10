@@ -30,7 +30,7 @@ public class NotificationHandler {
             groupId = "my-group-id"
     )
     public void receive(CreateAccountPayload message) {
-        log.info("Data received: {}", message);
+        log.info("Received {}: {}", message.getClass().getCanonicalName(), message);
         SpecificRecord response = validateMessage(message);
         messageBus.sendMessage(
                 response
