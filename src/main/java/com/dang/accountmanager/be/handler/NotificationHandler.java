@@ -9,9 +9,13 @@ import com.dang.commonlib.messaging.MessageBus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.specific.SpecificRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.header.internals.RecordHeader;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -29,11 +33,12 @@ public class NotificationHandler {
             topics = "${app.kafka.consumer.topic}",
             groupId = "my-group-id"
     )
-    public void receive(CreateAccountPayload message) {
-        log.info("Received {}: {}", message.getClass().getCanonicalName(), message);
-        SpecificRecord response = validateMessage(message);
+    public void receive(ConsumerRecord<String, SpecificRecord> message) {
+        log.info("Received {}: {}", message.value().getClass().getCanonicalName(), message.value());
+        SpecificRecord response = validateMessage((CreateAccountPayload) message.value());
         messageBus.sendMessage(
-                response
+                response,
+                List.of(new RecordHeader("messageId",message.headers().toArray()[0].value()))
         );
     }
 
