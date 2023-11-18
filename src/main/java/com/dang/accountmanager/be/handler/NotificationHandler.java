@@ -6,16 +6,14 @@ import avrogenerated.accountmanager.CreateAccountPayload;
 import com.dang.accountmanager.be.mapper.AccountMapper;
 import com.dang.accountmanager.be.repository.AccountRepository;
 import com.dang.commonlib.messaging.MessageBus;
+import com.dang.commonlib.messaging.MessageUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.specific.SpecificRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.header.internals.RecordHeader;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -38,7 +36,7 @@ public class NotificationHandler {
         SpecificRecord response = validateMessage((CreateAccountPayload) message.value());
         messageBus.sendMessage(
                 response,
-                List.of(new RecordHeader("messageId",message.headers().toArray()[0].value()))
+                MessageUtils.toHeaderMap(message.headers())
         );
     }
 

@@ -44,6 +44,7 @@
         <openapi.webmvc.ui.version>2.0.2</openapi.webmvc.ui.version>
         <openapi.javadoc.version>1.6.14</openapi.javadoc.version>
         <avsc.location>${project.basedir}/src/main/resources/avro</avsc.location>
+        <common.lib>0.0.2-SNAPSHOT</common.lib>
     </properties>
     <dependencies>
         <!--        SPRING BOOT STARTERS-->
@@ -125,7 +126,7 @@
         <dependency>
             <groupId>com.dang</groupId>
             <artifactId>common-lib</artifactId>
-            <version>0.0.1</version>
+            <version>${common.lib}</version>
         </dependency>
     </dependencies>
 
